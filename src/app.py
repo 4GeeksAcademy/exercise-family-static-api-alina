@@ -29,6 +29,8 @@ def sitemap():
 def getAllMembers():
 
     allMembers = jackson_family.get_all_members()
+    if (allMembers == None):
+        return jsonify({"msg": "Miembros no encontrado"}), 404
     return jsonify(allMembers), 200
 
 
@@ -37,7 +39,9 @@ def getAllMembers():
 def getSingleMember(member_id):
 
     singleMember = jackson_family.get_member(member_id)
-    return jsonify(singleMember)
+    if (singleMember == None):
+        return jsonify({"msg": "Miembro no encontrado"}), 404
+    return jsonify(singleMember), 200
 
 
 @app.route('/members', methods=['POST'])
@@ -50,9 +54,11 @@ def addMember():
 @app.route('/members/<int:member_id>', methods=['DELETE'])
 
 def deleteSingleMember(member_id):
-
-    deleteMember = jackson_family.delete_member(member_id)
-    return jsonify(deleteMember)
+    for member in jackson_family._members:
+        if member["id"] == member_id:
+            deleteMember = jackson_family.delete_member(member_id)
+            return jsonify(deleteMember), 200
+    return jsonify({"msg": "Miembro no encontrado"}), 404
     
 
 # this only runs if `$ python src/app.py` is executed
